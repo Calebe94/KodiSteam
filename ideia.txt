@@ -1,0 +1,16 @@
+### ideias ###
+*Para o Add-on, pode-se pegar as imagens e informações dos jogos do steam.db
+ Para isso preciso criar um programa que basta eu inserir o appid do jogo e ele me retorne 
+o header.jpg e outras outras informações (se necessário).
+*Acredito que terei que fazer o Python se comunicar com as aplicações em C/C++ pois até hoje(28/12/2016)
+não encontrei nenhuma informação sobre a possibilidade de criar Add-ons em C++.
+* Ao entrar no Add-on(Add-on de Vídeo provavelmente), terá 3 telas principais, Jogos Steam(Nativos), Jogos 
+Steam(Wine) e jogos diversos(Baixados de outros clientes,sim, quero colocar essa funcionalidade, foda-se).
+Para tanto, terei que que criar alguma aplicação que se comunique com o Steam Database para receber as 
+informações do jogo, AppID, Imagem ìcone, Compatibilidade com o Sistema Operacional.
+	> Preciso da lista de jogos do Usuário com seus respectiovos appID
+	> Preciso da lista de jogos já instalados(SteamLinux e SteamWINE separados)
+	|> Isso é para o caso do Usuário querer instalar algum jogo de sua Biblioteca 
+
+
+* Nas configurações do KodiSteam deverá conter os caminhos do Steam_WINE e Steam_Nativo
