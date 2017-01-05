@@ -20,7 +20,7 @@ void launch_game_cmd(char* cmd) {
   }
   if(pid == 0) {
     // Pipe stderr -> stdout -> logfile
-    dup2(fileno(g_logfile), fileno(stdout));
+    //dup2(fileno(g_logfile), fileno(stdout));
     dup2(fileno(stdout), fileno(stderr));
     system(cmd);
     exit(0);
@@ -28,10 +28,12 @@ void launch_game_cmd(char* cmd) {
 }
 
 void launch_wine_game(char *path,char* appid, char* username, char* password) {
-  char* cmd;
-  asprintf(&cmd, "%s/Steam.exe -silent -login %s %s -applaunch %s",path ,username, password, appid);
+  char cmd[1024];
+  snprintf(cmd,1024, "wine %sSteam.exe -silent -login %s %s -applaunch %s",path ,username, password, appid);
+  printf("cmd:%s\n",cmd);
   launch_game_cmd(cmd);
-  free(cmd);
+  //system(cmd);
+  //free(cmd);
 }
 
 int main(int argc,char *argv[]){

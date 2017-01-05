@@ -14,3 +14,28 @@ informações do jogo, AppID, Imagem ìcone, Compatibilidade com o Sistema Opera
 
 
 * Nas configurações do KodiSteam deverá conter os caminhos do Steam_WINE e Steam_Nativo
+
+Primeiro Passo: Coleta de informações - Iniciado em 28/12/2016
+    * Para criar um cliente Steam para o KODI teremos que obter a lista de jogos da biblioteca do Usuário,
+    a Única forma que eu encontrei para tal é utilizar o site da steamcommunity e exportar o arquivo com todos os jogos que o usuário possui em um arquivo .xml, e para baixar o arquivo pode-se utilizar o comando "wget" com a seguinte sintaxe:
+        wget <link> --output-document=<nome_do_documento.<extensão>>
+    link: http://steamcommunity.com/id/USER_ID/games?tab=all&xml=1
+        Onde: USER_ID pode ser obtido verificando o perfil no steam.db
+        http://forums.steampowered.com/forums/showthread.php?t=2797215
+    
+    Para analisar o(s) arquivo(s) será necessário um código ou biblioteca para ler xml em C/C++(ou Python).
+    P/ C/C++ eu encontrei a biblioteca "libxml2" que pelo oque eu li na internet é bem eficiente e fácil de se utilizar, ainda não li a documentação, mas pretendo ler futuramente.
+    
+    Com esses passos acima eu terei a lista de jogos do Usuário armazenados em estruturas em C/C++, então eu poderei instalar esses jogos utilizando o APP_ID do jogo e utilizando o "steamcmd", não sei os argumentos do steamcmd mas esses podem ser encontrados no seguinte link: https://github.com/dgibbs64/SteamCMD-Commands-List/blob/master/steamcmdcommands.txt
+    Aliás, o steamcmd é uma excelente ferramenta, então podemos usar e abusar dela.
+    
+    Também encontrei a lista de todos os jogos da steam: http://api.steampowered.com/ISteamApps/GetAppList/v0001/, e pode ser baixada pelo mesmo comando wget.
+    
+    O steamcmd possui um argumento que verifica quais jogos estão instalados no PC.
+    E Para verificar quais jogos estão instalados no PC tanto no Steam_LINUX e no Steam_WINE basta verificar os manifests na pasta Steam/steamapps, para isso eu encontrei um cliente do Steam escrito em C e utiliza a biblioteca gráfica NCurses e no código o desenvolvedor escreveu uma biblioteca somente para verificar os manifests na pasta.
+    E nesse mesmo cliente o desenvolvedor teve boas idéias para executar os jogos Steam_LINUX e Steam_WINE
+    
+    TODO:
+        *Verificar a possibilidade de se Usar o comando wget em C/C++;  pode-se utilizar a função system();
+    
+    TENTAR UTILIZAR O SteamBMC
