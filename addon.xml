@@ -2,17 +2,17 @@
 <addon id="plugin.video.example"
 version="2.1.0"
 name="Kodi_Steam"
-provider-name="Roman_V_M">
+provider-name="Calebe94">
 <requires>
   <import addon="xbmc.python" version="2.24.0"/>
 </requires>
-<extension point="xbmc.python.pluginsource" library="main.py">
+<extension point="xbmc.python.pluginsource" library="kodisteam.py">
   <provides>video</provides>
 </extension>
 <extension point="xbmc.addon.metadata">
-  <summary lang="en">Example Kodi Video Plugin</summary>
-  <description lang="en">An example video plugin for Kodi mediacenter.</description>
-  <disclaimer lang="en">Free sample videos are provided by www.vidsplay.com.</disclaimer>
+  <summary lang="en">A Steam Client to KODI</summary>
+  <description lang="en">This addon will launch your SteamOS and Wine Games.</description>
+  <disclaimer lang="en">Provided by Calebe94 and Distributed by GPL 3.0.</disclaimer>
   <assets>
     <icon>icon.png</icon>
     <fanart>fanart.jpg</fanart>
@@ -20,6 +20,6 @@ provider-name="Roman_V_M">
     <screenshot>resources\screenshot-02.jpg</screenshot>
     <screenshot>resources\screenshot-03.jpg</screenshot>    
   </assets>
-  <news>Updated with latest artwork metadata</news>
+  <news>In Development</news>
 </extension>
 </addon>

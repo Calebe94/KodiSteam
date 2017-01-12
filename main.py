@@ -3,10 +3,19 @@
 # Author: Roman V. M.
 # Created on: 28.11.2014
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
+from urllib.request import urlopen
+from collections import defaultdict
+from xml.dom import minidom
+from lxml import etree
+import xml.etree.ElementTree as ET
+import xml.sax
+import os
+
+import argparse
 
 import sys
-from urllib import urlencode
-from urlparse import parse_qsl
+import urllib
+from urllib.parse import parse_qsl
 import xbmcgui
 import xbmcplugin
 
@@ -19,6 +28,63 @@ _handle = int(sys.argv[1])
 # Here we use a fixed set of properties simply for demonstrating purposes
 # In a "real life" plugin you will need to get info and links to video files/streams
 # from some web-site or online service.
+def getAppID(str):
+	str1 = str.split('_')
+	str2 = str1[1]
+	str3 = str2.split('.')
+	return str3[0]
+
+def getName(search_appID):
+	for appID in range(0,len(LIBRARY['appID'])):
+		if search_appID == LIBRARY['appID'][appID]['appID']:
+			return LIBRARY['name'][appID]['name']
+
+
+def getInstalledGames_wine(path):
+    AUX_WINE=dict()
+    for file in os.listdir(path):
+        if file.endswith(".acf"):
+            appID = getAppID(file)
+            header = "http://cdn.edgecast.steamstatic.com/steam/apps/%s/header.jpg"%appID
+            AUX_WINE.setdefault('WINE',[]).append({'name':getName(appID),'appID':appID,'thumb':header})
+            """AUX_DICT.setdefault('name',[]).append({'name':getName(appID)})
+            AUX_DICT.setdefault('appID',[]).append({'appID':appID})
+            header = "http://cdn.edgecast.steamstatic.com/steam/apps/%s/header.jpg"%appID
+            AUX_DICT.setdefault('header',[]).append({'header':header})"""
+    return AUX_WINE
+
+def getInstalledGames_linux(path):
+    AUX_LINUX=dict()
+    for file in os.listdir(path):
+        if file.endswith(".acf"):
+            appID = getAppID(file)
+            header = "http://cdn.edgecast.steamstatic.com/steam/apps/%s/header.jpg"%appID
+            AUX_LINUX.setdefault('LINUX',[]).append({'name':getName(appID),'appID':appID,'thumb':header})
+            """AUX_DICT.setdefault('name',[]).append({'name':getName(appID)})
+            AUX_DICT.setdefault('appID',[]).append({'appID':appID})
+            header = "http://cdn.edgecast.steamstatic.com/steam/apps/%s/header.jpg"%appID
+            AUX_DICT.setdefault('header',[]).append({'header':header})"""
+    return AUX_LINUX
+
+def getOwnedGames(steamid):
+    owned_games = "http://steamcommunity.com/id/%s/games?tab=all&xml=1"%steamid
+    tree = ET.ElementTree(file=urlopen(owned_games))
+    root = tree.getroot()
+    
+    Owned=dict()
+    for game in root.iter('game'):
+	    Owned.setdefault('OWNED',[]).append({'name':game.find('name').text,'appID':game.find('appID').text,'thumb':game.find('logo').text})
+    return Owned
+
+
+VIDEOS = dict()
+VIDEOS.setdefault('OWNED',[])
+VIDEOS.setdefault('WINE',[])
+VIDEOS.setdefault('LINUX',[])
+VIDEOS['OWNED']=getOwnedGames("calebenovequatro")
+VIDEOS['WINE']=getInstalledGames_wine(STEAM_WINE_PATH)
+VIDEOS['LINUX']=getInstalledGames_linux(STEAM_LINUX_PATH)
+"""
 VIDEOS = {'Steam_LINUX': [{'name': 'Cave Story+',
                        'thumb': 'http://cdn.akamai.steamstatic.com/steamcommunity/public/images/apps/200900/a242e0465a65ffafbf75eeb521812fb575990a33.jpg',
                        'video': 'http://www.vidsplay.com/vids/crab.mp4',
@@ -58,7 +124,7 @@ VIDEOS = {'Steam_LINUX': [{'name': 'Cave Story+',
                       'video': 'http://www.vidsplay.com/vids/pizza.mp4',
                       'genre': 'Food'}
                      ]}
-
+"""
 
 def get_url(**kwargs):
     """
@@ -69,7 +135,7 @@ def get_url(**kwargs):
     :return: plugin call URL
     :rtype: str
     """
-    return '{0}?{1}'.format(_url, urlencode(kwargs))
+    return '{0}?{1}'.format(_url, urllib.urlencode(kwargs))
 
 
 def get_categories():
@@ -192,32 +258,17 @@ def play_video(path):
 
 
 def router(paramstring):
-    """
-    Router function that calls other functions
-    depending on the provided paramstring
-
-    :param paramstring: URL encoded plugin paramstring
-    :type paramstring: str
-    """
-    # Parse a URL-encoded paramstring to the dictionary of
-    # {<parameter>: <value>} elements
     params = dict(parse_qsl(paramstring))
-    # Check the parameters passed to the plugin
     if params:
         if params['action'] == 'listing':
-            # Display the list of videos in a provided category.
             list_videos(params['category'])
+
         elif params['action'] == 'play':
-            # Play a video from a provided URL.
-            #play_video(params['video'])
+            print("Has Member")
         else:
-            # If the provided paramstring does not contain a supported action
-            # we raise an exception. This helps to catch coding errors,
-            # e.g. typos in action names.
-            raise ValueError('Invalid paramstring: {0}!'.format(paramstring))
-    else:
-        # If the plugin is called from Kodi UI without any parameters,
-        # display the list of video categories
+            #raise ValueError("Invalid Paramstring:{0}!".format(paramstring))
+            list_categories()
+    else:   
         list_categories()
 
 def main():
