@@ -1,4 +1,3 @@
-from subprocess import Popen, PIPE
 import sys
 from urllib import urlencode
 from urlparse import parse_qsl
@@ -13,10 +12,8 @@ import os
 _url = sys.argv[0]
 # Get the plugin handle as an integer number.
 _handle = int(sys.argv[1])
-
 VIDEOS = dict()
 LIBRARY = dict()
-
 GET_APP_INFO = "https://steampics-mckay.rhcloud.com/info?apps=200900&prettyprint=1"
 
 ALL_GAMES = 'http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=xml'
@@ -24,15 +21,6 @@ LINUX_GAMES = 'https://raw.githubusercontent.com/SteamDatabase/SteamLinux/master
 
 STEAM_WINE_PATH = "/home/calebe945/PlayOnLinux's virtual drives/calebe945/drive_c/Program Files/Steam/steamapps/"
 STEAM_LINUX_PATH = "/home/calebe945/.steam/steam/steamapps/"
-STEAM_WINE_EXECUTABLE = "/home/calebe945/PlayOnLinux's virtual drives/calebe945/drive_c/Program Files/Steam/Steam.exe"
-
-index = 0
-username = ''
-password = ''
-def Login():
-    dialog = xbmcgui.Dialog()
-    username = dialog.input('Enter your Username', type=xbmcgui.INPUT_ALPHANUM)
-    password = dialog.input('Enter your Password', type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
 
 def getAppID(str):
 	str1 = str.split('_')
@@ -94,14 +82,47 @@ def getOwnedGames(steamid):
         Owned.setdefault('appID',[]).append({'appID':game.find('appID').text})
         Owned.setdefault('logo',[]).append({'logo':game.find('logo').text})
     return Owned
+LIBRARY.setdefault('appID',[])
+VIDEOS = {'Animals': [{'name': 'Crab',
+                       'thumb': 'http://www.vidsplay.com/vids/crab.jpg',
+                       'video': 'http://www.vidsplay.com/vids/crab.mp4',
+                       'genre': 'Animals'},
+                      {'name': 'Alligator',
+                       'thumb': 'http://www.vidsplay.com/vids/alligator.jpg',
+                       'video': 'http://www.vidsplay.com/vids/alligator.mp4',
+                       'genre': 'Animals'},
+                      {'name': 'Turtle',
+                       'thumb': 'http://www.vidsplay.com/vids/turtle.jpg',
+                       'video': 'http://www.vidsplay.com/vids/turtle.mp4',
+                       'genre': 'Animals'}
+                      ],
+            'Cars': [{'name': 'Postal Truck',
+                      'thumb': 'http://www.vidsplay.com/vids/us_postal.jpg',
+                      'video': 'http://www.vidsplay.com/vids/us_postal.mp4',
+                      'genre': 'Cars'},
+                     {'name': 'Traffic',
+                      'thumb': 'http://www.vidsplay.com/vids/traffic1.jpg',
+                      'video': 'http://www.vidsplay.com/vids/traffic1.avi',
+                      'genre': 'Cars'},
+                     {'name': 'Traffic Arrows',
+                      'thumb': 'http://www.vidsplay.com/vids/traffic_arrows.jpg',
+                      'video': 'http://www.vidsplay.com/vids/traffic_arrows.mp4',
+                      'genre': 'Cars'}
+                     ],
+            'Food': [{'name': 'Chicken',
+                      'thumb': 'http://www.vidsplay.com/vids/chicken.jpg',
+                      'video': 'http://www.vidsplay.com/vids/bbqchicken.mp4',
+                      'genre': 'Food'},
+                     {'name': 'Hamburger',
+                      'thumb': 'http://www.vidsplay.com/vids/hamburger.jpg',
+                      'video': 'http://www.vidsplay.com/vids/hamburger.mp4',
+                      'genre': 'Food'},
+                     {'name': 'Pizza',
+                      'thumb': 'http://www.vidsplay.com/vids/pizza.jpg',
+                      'video': 'http://www.vidsplay.com/vids/pizza.mp4',
+                      'genre': 'Food'}
+                     ]}
 
-VIDEOS.setdefault("OWNED",[])
-VIDEOS.setdefault("WINE",[])
-VIDEOS.setdefault("LINUX",[])
-VIDEOS['OWNED'] = getOwnedGames("calebenovequatro")
-LIBRARY = VIDEOS['OWNED']
-VIDEOS['WINE'] = getInstalledGames_wine(STEAM_WINE_PATH)
-VIDEOS['LINUX'] = getInstalledGames_linux(STEAM_LINUX_PATH)
 
 def get_url(**kwargs):
     return '{0}?{1}'.format(_url, urlencode(kwargs))
@@ -119,9 +140,9 @@ def list_categories():
     categories = get_categories()
     for category in categories:
         list_item = xbmcgui.ListItem(label=category)
-        list_item.setArt({'thumb': VIDEOS[category]['logo'][0]['logo'],
-                          'icon': VIDEOS[category]['logo'][0]['logo'],
-                          'fanart': VIDEOS[category]['logo'][0]['logo']})
+        list_item.setArt({'thumb': VIDEOS[category][0]['thumb'],
+                          'icon': VIDEOS[category][0]['thumb'],
+                          'fanart': VIDEOS[category][0]['thumb']})
         list_item.setInfo('video', {'title': category, 'genre': category})
         url = get_url(action='listing', category=category)
         is_folder = True
@@ -129,19 +150,15 @@ def list_categories():
     xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     xbmcplugin.endOfDirectory(_handle)
 
-item_to_play=""
 
 def list_videos(category):
-    videos = VIDEOS[category]
-    for video in range(0,len(videos['name'])):
-        list_item = xbmcgui.ListItem(label=videos['name'][video]['name'])
-        list_item.setInfo('video', {'title': videos['name'][video]['name'], 'genre': videos['appID'][video]['appID']})
-        list_item.setArt({'thumb':videos['logo'][video]['logo'],'icon':videos['logo'][video]['logo'],'fanart':videos['logo'][video]['logo']})
-        #list_item.setProperty('IsPlayable', 'true')
-        list_item.setProperty('Games','steam')
-        # Example: plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
-        item_to_play=videos['appID'][video]['appID']
-        url = get_url(action='play',video=item_to_play,category=category)
+    videos = get_videos(category)
+    for video in videos:
+        list_item = xbmcgui.ListItem(label=video['name'])
+        list_item.setInfo('video', {'title': video['name'], 'genre': video['genre']})
+        list_item.setArt({'thumb': video['thumb'], 'icon': video['thumb'], 'fanart': video['thumb']})
+        list_item.setProperty('IsPlayable', 'true')
+        url = get_url(action='play', video=video['video'])
         is_folder = False
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
     xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
@@ -159,21 +176,7 @@ def router(paramstring):
         if params['action'] == 'listing':
             list_videos(params['category'])
         elif params['action'] == 'play':
-            if params['category'] == "LINUX":
-                #oi = "steam -applaunch %s"%params['video']
-                #os.system(oi)
-                process = Popen(['steam','-applaunch',params['video'],'-silent'], stdout=PIPE, stderr=PIPE)
-                stdout, stderr = process.communicate()
-                pid = process.pid
-            elif params['category'] == "WINE":
-                process = Popen(['wine',STEAM_WINE_EXECUTABLE,'-applaunch',params['video'],'-silent'], stdout=PIPE, stderr=PIPE)
-                stdout, stderr = process.communicate()
-                pid = process.pid
-                #oi = "wine %s -applaunch %s"%(STEAM_WINE_EXECUTABLE,params['video'])
-                #os.system(oi)
-            else:
-                list_videos(params['category'])
-            #play_video(params['video'])
+            play_video(params['video'])
         else:
             raise ValueError('Invalid paramstring: {0}!'.format(paramstring))
     else:
