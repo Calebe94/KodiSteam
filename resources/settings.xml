@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="System">
+	<setting label="FirstRun" type="bool" id="FirstRun" default="false"/>
+	<setting label="steam_id" type="text" id="steam_id" default="" />
+	<setting label="steam_wine" type="folder" id="steam_wine" default="" />	
+	<setting label="steam_linux" type="folder" id="steam_linux" default="" />
+    </category>	
+</settings>

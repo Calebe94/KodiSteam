@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.example"
-version="2.1.0"
-name="Kodi_Steam"
-provider-name="Calebe94">
+<addon id="plugin.video.kodisteam" name="KodiSteam" version="0.0.1" provider-name="Calebe94">
 <requires>
   <import addon="xbmc.python" version="2.24.0"/>
 </requires>
@@ -22,4 +19,6 @@ provider-name="Calebe94">
   </assets>
   <news>In Development</news>
 </extension>
+<platform>linux</platform>
+<license>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</license>  
 </addon>
